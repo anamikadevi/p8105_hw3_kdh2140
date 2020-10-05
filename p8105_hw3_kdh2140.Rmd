@@ -123,7 +123,14 @@ accel = read_csv("./data/accel_data.csv") %>%
 
 #### Traditional Analyses
 
+```{r}
+accel %>% 
+  group_by(day_id) %>% 
+  summarize(total_activity = sum(activity_count)) %>% 
+  knitr::kable(digits = 1)
+```
 
+Idk trends?
 
 
 
