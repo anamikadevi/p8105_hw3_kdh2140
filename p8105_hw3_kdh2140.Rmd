@@ -91,7 +91,38 @@ instacart %>%
 
 ////
 
-## Problem 1
+## Problem 2
+
+Load in the dataset and tidy. 
+
+```{r}
+accel = read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "time_minute",
+    names_prefix = "activity_",
+    values_to = "activity_count"
+  ) %>% 
+   mutate(
+    week_day = case_when(
+      day == "Monday" ~ "weekday", 
+      day == "Tuesday" ~ "weekday", 
+      day == "Wednesday" ~ "weekday", 
+      day == "Thursday" ~ "weekday", 
+      day == "Friday" ~ "weekday", 
+      day == "Saturday" ~ "weekend",
+      day == "Sunday" ~ "weekend",
+      TRUE ~ ""
+    ))
+```
+
+#### Dataset Description
+
+
+
+#### Traditional Analyses
+
 
 
 
