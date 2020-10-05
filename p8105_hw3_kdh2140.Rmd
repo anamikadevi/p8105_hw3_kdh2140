@@ -4,7 +4,7 @@ author: Kristina Howell
 output: github_document
 ---
 
-The following settings will be used throughout the homework. 
+The following settings and libraries will be used throughout the homework. 
 
 ```{r settings, message = FALSE}
 library(tidyverse)
@@ -26,9 +26,29 @@ scale_colour_discrete = scale_color_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
+## Problem 1
 
+Load the datasets from the p8105 library. 
 
+```{r}
+library(p8105.datasets)
+data("instacart")
+```
 
+### Dataset Description
+
+The dataset **instacart** contains information about specific orders from the instacart online grocery service with 1,384,617 observations from 131,209 unique users. Key variables in the dataset include _department_, _aisle_, _product_name_, and _order_id_, as well as various entries representing time, day of week, and days since prior order. 
+
+Overall, the dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Each column represents an individual item ordered from a user. For example, the first 8 rows represent:
+
+* the _order_id_ 1 
+* from _user_id_ 112108 
+* includes items from _department_ "dairy eggs", "produce", and "canned goods"
+* featuring _product_name_ "Bulgarian Yogurt" ( _product_id_: 49302 ) and _product_name_ "Organic Celery Hearts" ( _product_id_: 10246 )
+
+The **complete list of variables** in the dataset is as follows: `r names(instacart)`.
+
+### Problem 1 Questions
 
 
 
