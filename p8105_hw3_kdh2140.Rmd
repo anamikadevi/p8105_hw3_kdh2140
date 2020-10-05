@@ -35,7 +35,7 @@ library(p8105.datasets)
 data("instacart")
 ```
 
-### Dataset Description
+#### Dataset Description
 
 The dataset **instacart** contains information about specific orders from the instacart online grocery service with 1,384,617 observations from 131,209 unique users. Key variables in the dataset include _department_, _aisle_, _product_name_, and _order_id_, as well as various entries representing time, day of week, and days since prior order. 
 
@@ -48,14 +48,50 @@ Overall, the dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` c
 
 The **complete list of variables** in the dataset is as follows: `r names(instacart)`.
 
-### Problem 1 Questions
+#### Problem 1 Questions
+
+##### How many aisles are there, and which aisles are the most items ordered from?
+
+The first code chunk identifies the total number of aisles: 134.
+```{r}
+instacart %>% 
+  summarize(n_aisle = n_distinct(aisle_id))
+```
+
+The second code chunk creates a tibble listing the aisles and how much they're ordered from. 
+```{r}
+instacart %>% 
+  group_by(aisle) %>% 
+  summarize(n_ordered = n()) %>% 
+  mutate(aisle_rank = min_rank(desc(n_ordered))) 
+```
+
+##### plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+
+Continuing from the above code chunk, 
+
+```{r}
+instacart %>% 
+  group_by(aisle) %>% 
+  summarize(n_ordered = n()) %>% 
+  mutate(aisle_rank = min_rank(desc(n_ordered))) %>% 
+  filter(n_ordered >= 10000) %>% 
+  ggplot(aes(x = aisle, y = n_ordered, color = aisle)) +
+  geom_point()
+```
 
 
+##### table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
 
+////
 
 
+#####  table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
+////
+
+## Problem 1
 
 
 
