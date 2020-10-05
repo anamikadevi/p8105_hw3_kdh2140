@@ -132,12 +132,25 @@ accel %>%
 
 Idk trends?
 
+#### Plot
 
+```{r}
+accel %>% 
+  group_by(day_id) %>% 
+  summarize(total_activity = sum(activity_count)) %>% 
+  ggplot(aes(x = day_id, y = total_activity)) +
+  geom_point()
+```
+ 
 
+## Problem 3
 
+Load in the dataset and tidy. 
 
-
-
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
 
 
 
