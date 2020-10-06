@@ -9,12 +9,6 @@ The following settings and libraries will be used throughout the homework.
 ```{r settings, message = FALSE}
 library(tidyverse)
 
-knitr::opts_chunk$set(
-  fig.width = 6, 
-  fig.asp = .6, 
-  out.width = "90%"
-)
-
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 options(
@@ -39,7 +33,7 @@ data("instacart")
 
 The dataset **instacart** contains information about specific orders from the instacart online grocery service with 1,384,617 observations from 131,209 unique users. Key variables in the dataset include _department_, _aisle_, _product_name_, and _order_id_, as well as various entries representing time, day of week, and days since prior order. 
 
-Overall, the dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Each column represents an individual item ordered from a user. For example, the first 8 rows represent:
+Overall, the dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Each row represents an individual item ordered from a user. For example, the first 8 rows represent:
 
 * the _order_id_ 1 
 * from _user_id_ 112108 
@@ -66,30 +60,65 @@ instacart %>%
   mutate(aisle_rank = min_rank(desc(n_ordered))) 
 ```
 
+_Live lecture code_
+
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  arrange(desc(n))
+```
+
 ##### plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
 Continuing from the above code chunk, 
 
+_Live lecture code_
+
 ```{r}
 instacart %>% 
-  group_by(aisle) %>% 
-  summarize(n_ordered = n()) %>% 
-  mutate(aisle_rank = min_rank(desc(n_ordered))) %>% 
-  filter(n_ordered >= 10000) %>% 
-  ggplot(aes(x = aisle, y = n_ordered, color = aisle)) +
-  geom_point()
+  count(aisle) %>% 
+  arrange(desc(n)) %>% 
+  filter(n >= 10000) %>% 
+  mutate(
+    aisle = factor(aisle),
+    aisle = fct_reorder(aisle, n)
+  ) %>% 
+  ggplot(aes(x = aisle, y = n, color = aisle)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
 
 ##### table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
 
+_Live lecture code_
 
-////
-
+```{r}
+instacart %>% 
+  filter(aisle %in% c( "baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  group_by(aisle) %>% 
+  count(product_name) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank < 4) %>% 
+  arrange(aisle, rank) %>% 
+  knitr::kable()
+```
 
 #####  table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
-////
+_Live lecture code_
+
+```{r}
+instacart %>% 
+  filter(product_name %in% c( "Pink Lady Apples", "Coffee Ice Cream")) %>% 
+  group_by(product_name, order_dow) %>% 
+  summarize(mean_hour = mean(order_hour_of_day)) %>% 
+  pivot_wider(
+    names_from = order_dow,
+    values_from = mean_hour
+  ) %>% 
+  knitr::kable()
+```
 
 ## Problem 2
 
@@ -119,6 +148,9 @@ accel = read_csv("./data/accel_data.csv") %>%
 
 #### Dataset Description
 
+The dataset **accel** contains activity collected from a 63 year old male through an accelerometer. The activity data, noted in the _activity_count_ variable, is recorded by minute, noted in the _time_minute_ variable. These are then divided by day, recorded in the _day_id_ variable, with the specific day of the week described in the _day_ variable. The dataset ranges from 1 - 5 weeks, as described in the _week_ variable. An additional variable, _week_day_ was created as a binary character, denoting whether a particular day observation was a weekday or weekend. 
+
+Overall, the dataset contains `r nrow(accel)` rows and `r ncol(accel)` columns. Each row represents an individual minute of each day. 
 
 
 #### Traditional Analyses
@@ -151,6 +183,37 @@ Load in the dataset and tidy.
 library(p8105.datasets)
 data("ny_noaa")
 ```
+
+#### Dataset Description
+
+The dataset **instacart** contains information about specific orders from the instacart online grocery service with 1,384,617 observations from 131,209 unique users. Key variables in the dataset include _department_, _aisle_, _product_name_, and _order_id_, as well as various entries representing time, day of week, and days since prior order. 
+
+Overall, the dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. Each column represents an individual item ordered from a user. For example, the first 8 rows represent:
+
+#### Problem 3 Questions
+
+##### Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+
+##### Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+
+
+
+
+
+##### Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
