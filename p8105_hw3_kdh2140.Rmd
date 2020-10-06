@@ -24,7 +24,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 Load the datasets from the p8105 library. 
 
-```{r}
+```{r dataset}
 library(p8105.datasets)
 data("instacart")
 ```
@@ -47,13 +47,13 @@ The **complete list of variables** in the dataset is as follows: `r names(instac
 ##### How many aisles are there, and which aisles are the most items ordered from?
 
 The first code chunk identifies the total number of aisles: 134.
-```{r}
+```{r aisle_number}
 instacart %>% 
   summarize(n_aisle = n_distinct(aisle_id))
 ```
 
 The second code chunk creates a tibble listing the aisles and how much they're ordered from. 
-```{r}
+```{r aisle_orders}
 instacart %>% 
   group_by(aisle) %>% 
   summarize(n_ordered = n()) %>% 
@@ -62,19 +62,19 @@ instacart %>%
 
 _Live lecture code_
 
-```{r}
+```{r code_better}
 instacart %>% 
   count(aisle) %>% 
   arrange(desc(n))
 ```
 
-##### plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+##### Plot the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered.
 
 Continuing from the above code chunk, 
 
 _Live lecture code_
 
-```{r}
+```{r aisle_plot}
 instacart %>% 
   count(aisle) %>% 
   arrange(desc(n)) %>% 
@@ -89,11 +89,11 @@ instacart %>%
 ```
 
 
-##### table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+##### Table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 
 _Live lecture code_
 
-```{r}
+```{r aisle_rank}
 instacart %>% 
   filter(aisle %in% c( "baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
   group_by(aisle) %>% 
@@ -104,11 +104,11 @@ instacart %>%
   knitr::kable()
 ```
 
-#####  table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+#####  Table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week.
 
 _Live lecture code_
 
-```{r}
+```{r item_comparison}
 instacart %>% 
   filter(product_name %in% c( "Pink Lady Apples", "Coffee Ice Cream")) %>% 
   group_by(product_name, order_dow) %>% 
@@ -122,9 +122,9 @@ instacart %>%
 
 ## Problem 2
 
-Load in the dataset and tidy. 
+Load in the dataset and tidy. The data cleaning steps include...
 
-```{r}
+```{r load_data, message = FALSE}
 accel = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   pivot_longer(
@@ -157,8 +157,13 @@ Overall, the dataset contains `r nrow(accel)` rows and `r ncol(accel)` columns. 
 
 ```{r}
 accel %>% 
-  group_by(day_id) %>% 
+  group_by(week, day) %>% 
   summarize(total_activity = sum(activity_count)) %>% 
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity
+  ) %>% 
+  relocate("week", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday") %>% 
   knitr::kable(digits = 1)
 ```
 
