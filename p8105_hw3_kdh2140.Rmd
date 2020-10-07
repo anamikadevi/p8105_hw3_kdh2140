@@ -179,23 +179,16 @@ Trends identified by viewing the table include:
 * The individual has less activity on Saturday as the weeks go on.
 * Tuesday, Wednesday, and Thursday levels of activity remain steady throughout the 5 weeks, while Friday, Saturday, Sunday, and Monday levels of activity vary greatly throughout the 5 weeks. 
 
-#### Plot
-
-```{r}
-accel %>% 
-  group_by(day_id) %>% 
-  summarize(total_activity = sum(activity_count)) %>% 
-  ggplot(aes(x = day_id, y = total_activity)) +
-  geom_point()
-```
+#### Plot activity data by minute and identified by day of week
  
-```{r}
+```{r activity_plot, message = FALSE}
 accel %>% 
   group_by(day_id) %>% 
   ggplot(aes(x = time_minute, y = activity_count, color = day)) +
-  geom_line()
+  geom_smooth()
 ```
 
+This is not the plot you want but i think it looks nice. 
 
 ## Problem 3
 
