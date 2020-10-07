@@ -122,7 +122,9 @@ instacart %>%
 
 ## Problem 2
 
-Load in the dataset and tidy. The data cleaning steps include...
+#### Load in the dataset and tidy 
+
+The data is imported through the read_csv function from the tidyverse library. The data cleaning steps include cleaning the names, through the clean_names() function in the janitor library, and reorganizing the data to represent activity as a variable, using the pivot_longer() function. The time_minute variable is then mutated into a numeric variable. All variables are numeric, except for day and week_day.
 
 ```{r load_data, message = FALSE}
 accel = read_csv("./data/accel_data.csv") %>% 
@@ -143,19 +145,24 @@ accel = read_csv("./data/accel_data.csv") %>%
       day == "Saturday" ~ "weekend",
       day == "Sunday" ~ "weekend",
       TRUE ~ ""
-    ))
+    )) %>% 
+  mutate(time_minute = as.numeric(time_minute))
 ```
 
 #### Dataset Description
 
-The dataset **accel** contains activity collected from a 63 year old male through an accelerometer. The activity data, noted in the _activity_count_ variable, is recorded by minute, noted in the _time_minute_ variable. These are then divided by day, recorded in the _day_id_ variable, with the specific day of the week described in the _day_ variable. The dataset ranges from 1 - 5 weeks, as described in the _week_ variable. An additional variable, _week_day_ was created as a binary character, denoting whether a particular day observation was a weekday or weekend. 
+The dataset **accel** contains activity collected from a 63 year old male through an accelerometer. This data was collected due to an admission to the Advanced Cardiac Care Center of Columbia University Medical Center and subsequent diagnosis of congestive heart failure (CHF). 
+
+The activity data ( _activity_count_ ) is recorded by minute ( _time_minute_ ). These are then divided by day ( _day_id_ ) with the specific day of the week described in the _day_ variable. The dataset ranges from 1 - 5 weeks, as described in the _week_ variable. An additional variable, _week_day_, was created as a binary character, denoting whether a particular day observation was a weekday or weekend. Weekday is defined as Monday through Friday and weekend is defined as Saturday and Sunday.
 
 Overall, the dataset contains `r nrow(accel)` rows and `r ncol(accel)` columns. Each row represents an individual minute of each day. 
 
 
 #### Traditional Analyses
 
-```{r}
+The following code chunk creates a table that describes total activity per day, created using the mutate function to sum the activity_count (recorded by minute) when grouped by day. The table is then formatted from long to wide, using the pivot_wider function, to increase readability. 
+
+```{r activity_table, message = FALSE}
 accel %>% 
   group_by(week, day) %>% 
   summarize(total_activity = sum(activity_count)) %>% 
@@ -167,7 +174,10 @@ accel %>%
   knitr::kable(digits = 1)
 ```
 
-Idk trends?
+Trends identified by viewing the table include:
+
+* The individual has less activity on Saturday as the weeks go on.
+* Tuesday, Wednesday, and Thursday levels of activity remain steady throughout the 5 weeks, while Friday, Saturday, Sunday, and Monday levels of activity vary greatly throughout the 5 weeks. 
 
 #### Plot
 
@@ -179,6 +189,13 @@ accel %>%
   geom_point()
 ```
  
+```{r}
+accel %>% 
+  group_by(day_id) %>% 
+  ggplot(aes(x = time_minute, y = activity_count, color = day)) +
+  geom_line()
+```
+
 
 ## Problem 3
 
