@@ -17,7 +17,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 options(
   ggplot2.continuous.colour = "viridis", 
-  ggplot2.continuous.fill = "virirdis"
+  ggplot2.continuous.fill = "viridis"
 )
 
 scale_colour_discrete = scale_color_viridis_d
@@ -128,7 +128,7 @@ instacart %>%
 
 #### Load in the dataset and tidy 
 
-The data is imported through the read_csv function from the tidyverse library. The data cleaning steps include cleaning the names, through the clean_names() function in the janitor library, and reorganizing the data to represent activity as a variable, using the pivot_longer() function. The time_minute variable is then mutated into a numeric variable. All variables are numeric, except for day and week_day.
+The data is imported through the read_csv function from the tidyverse library. The data cleaning steps include cleaning the names, through the clean_names() function in the janitor library, and reorganizing the data to represent activity as a variable, using the pivot_longer() function. The time_minute variable is then mutated into a numeric variable. Therefore, all variables are numeric, except for day and week_day.
 
 ```{r load_data, message = FALSE}
 accel = read_csv("./data/accel_data.csv") %>% 
@@ -159,7 +159,7 @@ The dataset **accel** contains activity collected from a 63 year old male throug
 
 The activity data ( _activity_count_ ) is recorded by minute ( _time_minute_ ). These are then divided by day ( _day_id_ ) with the specific day of the week described in the _day_ variable. The dataset ranges from 1 - 5 weeks, as described in the _week_ variable. An additional variable, _week_day_, was created as a binary character, denoting whether a particular day observation was a weekday or weekend. Weekday is defined as Monday through Friday and weekend is defined as Saturday and Sunday.
 
-Overall, the dataset contains `r nrow(accel)` rows and `r ncol(accel)` columns. Each row represents an individual minute of each day. 
+Overall, the dataset contains `r nrow(accel)` rows and `r ncol(accel)` columns. Each row represents an individual minute of each day throughout the five weeks. 
 
 
 #### Traditional Analyses
@@ -180,36 +180,60 @@ accel %>%
 
 Trends identified by viewing the table include:
 
-* The individual has less activity on Saturday as the weeks go on.
+* The individual has less activity on Saturday as the weeks go on. This may be an error in the recording of the data. 
 * Tuesday, Wednesday, and Thursday levels of activity remain steady throughout the 5 weeks, while Friday, Saturday, Sunday, and Monday levels of activity vary greatly throughout the 5 weeks. 
 
 #### Plot activity data by minute and identified by day of week
  
-```{r activity_plot, message = FALSE}
+The following code chunk creates a plot that displays the total activity count per minute of the day for each day of the 5 weeks. This results in 35 lines, each color coded for the specific day of the week. The graph is not very readable, but is what I believe the question requests. 
+ 
+```{r activity_plot_ng, message = FALSE}
 accel %>% 
   group_by(day, week) %>% 
   ggplot(aes(x = time_minute, y = activity_count, color = day)) +
-  geom_line()
-##Need to add labels
+  geom_line() +
+  labs(
+    title = "Accelerometer Data by Day",
+    x = "Minute of the day (0 - 1440)",
+    y = "Activity",
+    caption = "This graph has 35 lines each representing a unique day within the 5 weeks of data records.
+    The individual days of the week are color coded, with each day of the week having 5 lines."
+  )
 ```
 
-I believe this is the plot you want. It is not very readable.
+Identfied trends include:
 
+* Minimal activity in the beginning and end points of the graph (presumably early morning and night). 
+* Friday has greater activity later in the day. 
+* Wednesday has an individual peak in the later middle of the day.
 
-```{r activity_plot_nice, message = FALSE}
+The following code chunk is a different graph that I believe is more readable. It uses the geom_smooth to create intervals and allow clear identification of the day.
+
+```{r activity_plot_nice, message=FALSE, warning=FALSE}
 accel %>% 
   group_by(day, week) %>% 
   ggplot(aes(x = time_minute, y = activity_count, color = day)) +
-  geom_smooth()
+  geom_smooth() +
+  labs(
+    title = "Accelerometer Data by Day",
+    x = "Minute of the day (0 - 1440)",
+    y = "Activity",
+    caption = "This graph has 7 lines each representing the variation within the 5 weeks of data records."
+  )
 ```
 
-This is not the plot you want but i think it looks nice. 
+Identfied trends include:
+
+* Minimal activity in the beginning and end points of the graph (presumably early morning and night). 
+* Friday has greater activity later in the day. 
+* Sunday has a peak in the middle of the day
+* Most days of the week mantain similar levels throughout the course of each individual day, with some variation.
 
 ## Problem 3
 
 Load in the dataset and tidy. 
 
-```{r}
+```{r load_noaa}
 library(p8105.datasets)
 data("ny_noaa")
 ```
@@ -218,7 +242,7 @@ data("ny_noaa")
 
 The dataset **ny_noaa** was pulled from the NOAA National Climatic Data Center on August 15, 2017. It includes information from all weather stations in New York state ranging from January 1, 1981 to December 31, 2010. 
 
-Weather stations are identified by the variable _id_ and the date is recorded in the variable _date_. Informational variables include _pcrp_ (), _snow_ (), _snwd_ (), _tmax_ (), and _tmin_ ().
+Weather stations are identified by the variable _id_ and the date is recorded in the variable _date_. Informational variables include _pcrp_ (precipitation), _snow_ (snowfall), _snwd_ (snowdepth), _tmax_ (max temp), and _tmin_ (min temp).
 
 Overall, the dataset contains `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. Each column represents an individual date per weather station.
 
@@ -230,7 +254,7 @@ The data cleaning step includes creating separate variables for year, month, and
 
 The temperature variable is then reformatted to display temperature in degrees celsius, rather than tenths of a degree celsius. Precipitation is also reformatted to display rainfall in mm, rather than tenths of a mm. Snowfall and snowdepth are already displayed in mm. 
 
-```{r}
+```{r clean_noaa}
 ny_noaa_df = 
 ny_noaa %>% 
   separate(date, into = c("year", "month"), sep = 5) %>% 
@@ -238,7 +262,9 @@ ny_noaa %>%
   separate(month, into = c("month", "day"), sep = 2) %>% 
   separate(day, into = c("y", "day"), sep = 1) %>% 
   select(-x, -y) %>% 
-  #note: when separating date into different variables in a tidier way, r crashes, most likely due to the size of the dataset. 
+  #note: when separating date into different variables in a tidier way, r crashes,
+  #most likely due to the size of the dataset. Using brief individual steps 
+  #allowed it to process fully on my computer. 
   mutate(tmin = as.numeric(tmin),
          tmax = as.numeric(tmax),
          month = as.numeric(month)
@@ -248,7 +274,11 @@ ny_noaa %>%
     tmax = tmax / 10, 
     prcp = prcp / 10
     )
+```
 
+The following code chunk displays the most common snowfall values in a tibble.
+
+```{r}
 ny_noaa_df %>% 
   count(snow) %>% 
   arrange(desc(n))
@@ -256,9 +286,11 @@ ny_noaa_df %>%
     
 For snowfall, the most commonly observed value is 0. This is most likely due to the fact that, the majority of the year, it is not snowing in NYS.
     
-##### Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+##### Two-panel plot showing the average max temperature in January and in July in each station across years
 
-```{r}
+**** Describe process of making plot.
+
+```{r month_plot, message=FALSE, warning=FALSE}
 ny_noaa_df %>% 
   filter(month == c(01, 06)) %>% 
   group_by(id, year, month) %>% 
@@ -268,43 +300,54 @@ ny_noaa_df %>%
   geom_line() +
   theme(legend.position = "none") +
   facet_grid(. ~ month) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  labs(
+    title = "Average Max Temperature (Jan & July)",
+    x = "Year",
+    y = "Max Temp (C)",
+    caption = "Each colored point represents a unique station in NYS."
+  )
+  
+  # Note: legend presents so large that it does not allow view of the plot 
+  #(on my screen at least) so it has been removed. 
 
-  # Note: legend
 ```
 
+**** Describe plot results.
 
-##### Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+##### Two-panel plot: Temperature and Snowfall
 
-```{r}
+**** Describe
+
+```{r two_panel_plot, message = FALSE}
+temp = 
   ny_noaa_df %>% 
   drop_na(tmax, tmin) %>% 
   ggplot(aes(x = tmax, y = tmin)) + 
-  geom_hex()
+  geom_hex() +
+  labs(
+    title = "Temperature Comparison",
+    x = "Max Temperature (C)",
+    y = "Min Temperature (C)"
+  )
 
-## need to change to geom_hex
-```
-
-
-
-```{r}
-ny_noaa_df %>% 
-  ggplot(aes(x = as.numeric(tmax), y = as.numeric(tmin))) + 
-  geom_hex()
-```
-
-
-
-```{r}
 snow_plot = 
   ny_noaa_df %>% 
   filter(snow > 0) %>% 
   filter(snow < 100) %>% 
   ggplot(aes(x = snow, y = as.factor(year))) +
-  geom_density_ridges()
+  geom_density_ridges() +
+  labs(
+    title = "Distribution of snow by year",
+    x = "Distribution of snow (mm)",
+    y = "Year"
+  )
+
+temp + snow_plot
+
 ```
 
-
+** Describe
 
 
 
