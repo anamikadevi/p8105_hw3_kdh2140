@@ -8,6 +8,10 @@ The following settings and libraries will be used throughout the homework.
 
 ```{r settings, message = FALSE}
 library(tidyverse)
+library(ggplot2)
+library(ggridges)
+library(patchwork)
+library(hexbin)
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
@@ -183,7 +187,18 @@ Trends identified by viewing the table include:
  
 ```{r activity_plot, message = FALSE}
 accel %>% 
-  group_by(day_id) %>% 
+  group_by(day, week) %>% 
+  ggplot(aes(x = time_minute, y = activity_count, color = day)) +
+  geom_line()
+##Need to add labels
+```
+
+I believe this is the plot you want. It is not very readable.
+
+
+```{r activity_plot_nice, message = FALSE}
+accel %>% 
+  group_by(day, week) %>% 
   ggplot(aes(x = time_minute, y = activity_count, color = day)) +
   geom_smooth()
 ```
@@ -246,23 +261,48 @@ For snowfall, the most commonly observed value is 0. This is most likely due to 
 ```{r}
 ny_noaa_df %>% 
   filter(month == c(01, 06)) %>% 
-  group_by(id, month) %>% 
-  mutate(mean_tmax = mean(tmax)) %>% 
-  drop_na(mean_tmax) %>% 
+  group_by(id, year, month) %>% 
+  summarize(mean_tmax = mean(tmax)) %>% 
   ggplot(aes(x = year, y = mean_tmax, color = id)) + 
-  geom_line()
+  geom_point() +
+  geom_line() +
+  theme(legend.position = "none") +
+  facet_grid(. ~ month) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+  # Note: legend
 ```
-
-
-
 
 
 ##### Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
+```{r}
+  ny_noaa_df %>% 
+  drop_na(tmax, tmin) %>% 
+  ggplot(aes(x = tmax, y = tmin)) + 
+  geom_hex()
+
+## need to change to geom_hex
+```
 
 
 
+```{r}
+ny_noaa_df %>% 
+  ggplot(aes(x = as.numeric(tmax), y = as.numeric(tmin))) + 
+  geom_hex()
+```
 
+
+
+```{r}
+snow_plot = 
+  ny_noaa_df %>% 
+  filter(snow > 0) %>% 
+  filter(snow < 100) %>% 
+  ggplot(aes(x = snow, y = as.factor(year))) +
+  geom_density_ridges()
+```
 
 
 
