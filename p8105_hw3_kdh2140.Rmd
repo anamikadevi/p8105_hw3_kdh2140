@@ -288,11 +288,11 @@ For snowfall, the most commonly observed value is 0. This is most likely due to 
     
 ##### Two-panel plot showing the average max temperature in January and in July in each station across years
 
-**** Describe process of making plot.
+This plot is created by grouping the relevant variables (id, month, year) and then summarizing the tmax into a new variable to allow examination. The plot is then separated by month, using the facet_grid function, to display January and July side by side. Year is plotted along the x axis, from 1981 to 2010, with each colored point representing a unique station in New York State. 
 
 ```{r month_plot, message=FALSE, warning=FALSE}
 ny_noaa_df %>% 
-  filter(month == c(01, 06)) %>% 
+  filter(month == c(01, 07)) %>% 
   group_by(id, year, month) %>% 
   summarize(mean_tmax = mean(tmax)) %>% 
   ggplot(aes(x = year, y = mean_tmax, color = id)) + 
@@ -313,11 +313,11 @@ ny_noaa_df %>%
 
 ```
 
-**** Describe plot results.
+The plot demonstrates that, in January and July, there is mild fluctuation between the yearly reports of max temperature in the weather stations. Further, January consistently reports cooler temperatures throughout this time frame as compared to July. July does have some weather stations that are distanced from the cluster, as seen in 1988 and 2004, but this could represent geographic differences. 
 
 ##### Two-panel plot: Temperature and Snowfall
 
-**** Describe
+The following code chunk creates two separate plots and displays them side by side through the use of the patchwork function. The first plot code creates a hex plot displaying the comparison between aggregate min and max temperatures. The second plot code creates a ridge plot displayiing the snow distribution by year, filtering by values that are greater than 0 but less than 100 mm. 
 
 ```{r two_panel_plot, message = FALSE}
 temp = 
@@ -347,7 +347,9 @@ temp + snow_plot
 
 ```
 
-** Describe
+The first plot, _temp_, demonstrates a wide variety of miin and max temperatures, with a strong concentration of min and max temperatures around 20 (C) and 25 (C) respectively. This represents expected temperatures for most of the year in New York State. A second point of interest lies at min and max temperature of 0 (C) and 5 (C) respectively, which would correspond to the majority of winter months experienced in NYS. 
+
+The second plot, _snow_plot_, displays a steady level of snow distribution in the years of 1981 to 2010. The overall peaks tend to decrease as times go on, but still occur around the same quantity of snow (10, 30, 50, and 75 mm of snow distribution, roughly).
 
 
 
